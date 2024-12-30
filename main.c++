@@ -1,207 +1,133 @@
-#include<iostream>
+#include <bits/stdc++.h>
+
 using namespace std;
 
-class node{
+class SinglyLinkedListNode {
     public:
-    int data;
-    node*next;
+        int data;
+        SinglyLinkedListNode *next;
 
-    node(){
-        this -> data = -1;
-        this -> next = NULL;
-    }
-
-    node(int data){
-        this -> data = data;
-        this -> next = NULL;
-    }
-
-    ~node(){
-        cout << "node with data " << this->data << " is deleted\n";
-    }
+        SinglyLinkedListNode(int node_data) {
+            this->data = node_data;
+            this->next = nullptr;
+        }
 };
 
-void print(node* &head){
-    node*temp = head;
-    while(temp!=NULL){
-        cout << temp->data << ' ';
-        temp = temp -> next;
-    }
-    cout << "\n\n";
-}
+class SinglyLinkedList {
+    public:
+        SinglyLinkedListNode *head;
+        SinglyLinkedListNode *tail;
 
-void insertAtHead(node* &head, node* &tail, int data){
-    node* newNode = new node(data);
-        // yaha pr ques aa skta hai ki yah jo nayi node bnayi hai vo to ek function ke andr bni hai, mtlb function ke baag khtm ho jayegi?
-        // nhi khtm hogi kyuki ye nayi node dynamically bnayi gyi hai
-        // mtlb nayi node khtm nhi hogi, pr haa newNode naam ka pointer khtm ho jayega
-        // kyuki nayi node heap memory me bni hai, aur newNode pointer stack memory me bana hai(jo function ke baad destroy ho jata hai)
+        SinglyLinkedList() {
+            this->head = nullptr;
+            this->tail = nullptr;
+        }
 
-    if(head==NULL){
-        head = newNode;
-        tail = newNode;
-    }
-    else{
-        newNode -> next = head;
-        head = newNode;
-    }
+        void insert_node(int node_data) {
+            SinglyLinkedListNode* node = new SinglyLinkedListNode(node_data);
 
-}
+            if (!this->head) {
+                this->head = node;
+            } else {
+                this->tail->next = node;
+            }
 
-void insertAtTail(node*&head, node* &tail, int data){
-    node* newNode = new node(data);
+            this->tail = node;
+        }
+};
 
-    if(head==NULL){
-        head = newNode;
-        tail = newNode;
-    }
-    else{
-        tail->next = newNode;
-        tail = newNode;
+void print_singly_linked_list(SinglyLinkedListNode* node, string sep, ofstream& fout) {
+    while (node) {
+        fout << node->data;
+
+        node = node->next;
+
+        if (node) {
+            fout << sep;
+        }
     }
 }
 
-int getLength(node*&head){
-    node*temp = head;
-    int ans = 0;
-    while(temp!=NULL){
-        ans++;
-        temp = temp->next;
-    }
+void free_singly_linked_list(SinglyLinkedListNode* node) {
+    while (node) {
+        SinglyLinkedListNode* temp = node;
+        node = node->next;
 
-    return ans;
+        free(temp);
+    }
 }
 
-// pos starts from 1
-void insertAtPosition(node* &head, node* &tail, int pos, int data){
-    node * newNode = new node(data);
+/*
+ * Complete the 'getNode' function below.
+ *
+ * The function is expected to return an INTEGER.
+ * The function accepts following parameters:
+ *  1. INTEGER_SINGLY_LINKED_LIST llist
+ *  2. INTEGER positionFromTail
+ */
 
-    // code is perfect without this too
-        // if(head==NULL){
-        //     head = newNode;
-        //     tail = newNode;
-        //     return;
-        // }
+/*
+ * For your reference:
+ *
+ * SinglyLinkedListNode {
+ *     int data;
+ *     SinglyLinkedListNode* next;
+ * };
+ *
+ */
 
-    // insert at head
-    if(pos==1){
-        insertAtHead(head, tail, data);
-        return;
+void fun( SinglyLinkedListNode* head,int &positionFromTail,int &ans){
+    if (head == 0) return; 
+    fun(head->next , positionFromTail, ans);
+    
+    //
+    if(positionFromTail == 0){
+        ans = head -> data;
     }
-
-    // insert at tail or beyond that    also for case when head=NULL / len=0
-    int len = getLength(head);
-    if(pos>len){
-        insertAtTail(head, tail, data);
-        return;
-    }
-
-    // insert in between LL
-    node*temp = head;
-    int i = 1;
-    while(i<=pos-2){
-        temp = temp -> next;
-        i++;
-    }
-
-    newNode->next = temp->next;
-    temp->next = newNode;
+    positionFromTail--;
 }
 
-// pos starts from 1
-void deleteAtPosition(node* &head, node* &tail, int pos){
-    if(head==NULL){
-        cout << "cannot delete from empty LL\n";
-        return;
-    }
 
-    if(head->next==NULL){
-        node*temp = head;
-        delete temp;
-        head=NULL;
-        tail=NULL;
-        return;
-    }
+int getNode(SinglyLinkedListNode* head, int positionFromTail) {
 
-    if(pos==1){
-        node*temp = head;
-        head = head->next;
-        // temp->next = NULL;
-        delete temp;
-        return;
-    }
-
-    int len = getLength(head);
-    if(pos>len){
-        cout << "position exceed length of linked list\n";
-        return;
-    }
-
-    node*temp = head;
-    int i=1;
-    while(i<=pos-2){
-        temp = temp->next;
-        i++;
-    }
-    node*nodeToDel = temp->next;
-    temp->next = temp->next->next;
-    // nodeToDel->next = NULL;
-    delete nodeToDel;
-
-    if(temp->next==NULL)
-        tail = temp;
+  int ans = -1;
+  fun(head, positionFromTail, ans);
+  return ans;
 }
 
-int main(){
+int main()
+{
+    ofstream fout(getenv("OUTPUT_PATH"));
 
-    /*// creating a linked list from individual nodes and printing it
-        node* first = new node();
-        node* second = new node(20);
-        node* third = new node();
-        node* forth = new node(40);
-        node* fifth = new node(50);
+    int tests;
+    cin >> tests;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-        first->next = second;
-        second->next = third;
-        third->next = forth;
-        forth->next = fifth;
+    for (int tests_itr = 0; tests_itr < tests; tests_itr++) {
+        SinglyLinkedList* llist = new SinglyLinkedList();
 
-        print(first);
-    */
+        int llist_count;
+        cin >> llist_count;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    /*// creating, inserting and deleting from a linked list
-    */
-        node * head = NULL;
-        node * tail = NULL;
-        insertAtHead(head, tail, 20);
-        insertAtHead(head, tail, 30);
-        insertAtHead(head, tail, 40);
-        insertAtHead(head, tail, 50);
-        print(head);
+        for (int i = 0; i < llist_count; i++) {
+            int llist_item;
+            cin >> llist_item;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-        insertAtTail(head, tail, 10);
-        insertAtTail(head, tail, 9);
-        insertAtTail(head, tail, 8);
-        print(head);
+            llist->insert_node(llist_item);
+        }
 
-        insertAtPosition(head, tail, 3, 35);
-        print(head);
-        insertAtPosition(head, tail, 1, 60);
-        print(head);
-        insertAtPosition(head, tail, 10, 7);
-        print(head);
-        insertAtPosition(head, tail, 15, 6);
-        print(head);
-        cout << "\n";
+        int position;
+        cin >> position;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-        deleteAtPosition(head, tail, 1);
-        print(head);
-        deleteAtPosition(head, tail, 3);
-        print(head);
-        deleteAtPosition(head, tail, 9);
-        print(head);
-        deleteAtPosition(head, tail, 9);
-        print(head);
+        int result = getNode(llist->head, position);
+
+        fout << result << "\n";
+    }
+
+    fout.close();
 
     return 0;
 }
